@@ -191,7 +191,8 @@ class GithubAPIBot:
 
     def hasMinimumFollowers(self, username):
         user = self.getUser(username)
-        return user["followers"] >= self.__minFollowers
+        
+        return user["followers"] and user["followers"] >= self.__minFollowers
 
     def getUsers(self, url="", maxAction=None, following=False):
         users = []
@@ -258,13 +259,16 @@ class GithubAPIBot:
         if username == None:
             username = self.username
         print(f"\nGrabbing {username}'s followers.\n")
-        self.usersToAction.extend(
-            self.getUsers(
+        users = self.getUsers(
                 url=f"https://api.github.com/users/{username}/followers",
                 maxAction=self.maxAction,
                 following=following,
             )
-        )
+        file = open(f"{username}_following.txt", "a")
+        print(f"\n{len(users)} followers found.\n")
+        for user in users:
+            file.write(user + "\n")
+        self.usersToAction.extend(users)
 
     def getFollowings(self, username=None):
         if username == None:
